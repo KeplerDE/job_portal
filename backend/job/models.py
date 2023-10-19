@@ -3,7 +3,8 @@ from datetime import *
 from django.db import models
 from django.contrib.auth.models import User
 
-
+import geocoder
+import os
 
 from django.contrib.gis.db import models as gismodels
 from django.contrib.gis.geos import Point
@@ -72,3 +73,25 @@ class Job(models.Model):
     lastDate = models.DateTimeField(default=return_date_time)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     createdAt = models.DateTimeField(auto_now_add=True)
+
+
+    def save(self, *args, **kwargs):
+        #Выполняем геокодирование адреса
+        g = geocoder.mapquest(self.address, key=os.environ.get('GEOCODER_API'))
+
+        # Выводим результат геокодирования в консоль (может быть полезно для отладки)
+        print(g)
+
+        # Извлекаем долготу и широту из результата геокодирования
+        lng = g.lng
+        lat = g.lat
+
+        # Создаем объект Point с полученными координатами и сохраняем его в атрибут self.point
+        self.point = Point(lng, lat)
+
+        # Вызываем метод save() суперкласса (Job) для сохранения объекта Job
+        super(Job, self).save(*args, **kwargs)
+
+
+
+
