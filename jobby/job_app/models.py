@@ -2,8 +2,9 @@ from datetime import *
 from django.db import models
 from django.contrib.auth.models import User
 
+
 import geocoder
-import os
+from decouple import config
 
 from django.contrib.gis.db import models as gismodels
 from django.contrib.gis.geos import Point
@@ -76,7 +77,7 @@ class Job(models.Model):
 
     def save(self, *args, **kwargs):
         #Выполняем геокодирование адреса
-        g = geocoder.mapquest(self.address, key=os.environ.get('GEOCODER_API'))
+        g = geocoder.mapquest(self.address, key=config('API_KEY'))
 
         # Выводим результат геокодирования в консоль (может быть полезно для отладки)
         print(g)
