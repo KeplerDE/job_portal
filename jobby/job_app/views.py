@@ -5,6 +5,7 @@ from rest_framework.response import Response
 
 from .serializers import JobSerializer
 from .models import Job
+from django.shortcuts import get_object_or_404
 
 
 @api_view(['GET'])
@@ -16,4 +17,13 @@ def getAllJobs(request):
     serializer = JobSerializer(jobs, many=True)
 
     # Возвращаем HTTP-ответ с данными, полученными из сериализатора, в формате JSON
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getJob(request, pk):
+    job = get_object_or_404(Job, id=pk)
+
+    serializer = JobSerializer(job, many=False)
+
     return Response(serializer.data)
