@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
+from rest_framework import status
 
 from .serializers import JobSerializer
 from .models import Job
@@ -27,3 +27,50 @@ def getJob(request, pk):
     serializer = JobSerializer(job, many=False)
 
     return Response(serializer.data)
+
+
+@api_view(['POST'])
+def newJob(request):
+    data = request.data
+
+    job = Job.objects.create(**data)
+
+    serializer = JobSerializer(job, many=False)
+    return Response(serializer.data)
+
+
+@api_view(['PUT'])
+def updateJob(request, pk):
+    job = get_object_or_404(Job, id=pk)
+
+    # Обновление полей объекта job данными из запроса
+    job.title = request.data['title']
+    job.description = request.data['description']
+    job.email = request.data['email']
+    job.address = request.data['address']
+    job.jobType = request.data['jobType']
+    job.education = request.data['education']
+    job.industry = request.data['industry']
+    job.experience = request.data['experience']
+    job.salary = request.data['salary']
+    job.positions = request.data['positions']
+    job.company = request.data['company']
+
+    # Сохранение обновленного объекта
+    job.save()
+
+    serializer = JobSerializer(job, many=False)
+
+    return Response(serializer.data)
+
+@api_view(['DELETE'])
+def deleteJob(request, pk):
+    # Получаем объект вакансии с заданным идентификатором (pk) или возвращаем ошибку 404, если он не существует
+    job = get_object_or_404(Job, id=pk)
+    print(job)
+    # Удаляем объект вакансии из базы данных.
+    job.delete()
+
+    # Возвращаем JSON-ответ, сообщая, что вакансия была удалена, и код состояния HTTP 200 (OK)
+    return Response({'message': 'Job is Deleted.'}, status=status.HTTP_200_OK)
+
