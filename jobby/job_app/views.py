@@ -6,15 +6,14 @@ from rest_framework import status
 from .serializers import JobSerializer
 from .models import Job
 from django.shortcuts import get_object_or_404
-
+from .filters import JobsFilter
 
 @api_view(['GET'])
 def getAllJobs(request):
-    # Получаем все объекты модели Job из базы данных
-    jobs = Job.objects.all()
+    filterset = JobsFilter(request.GET, queryset=Job.objects.all().order_by('id'))
 
     # Создаем сериализатор JobSerializer, который будет использоваться для преобразования объектов Job в JSON
-    serializer = JobSerializer(jobs, many=True)
+    serializer = JobSerializer(filterset.qs, many=True)
 
     # Возвращаем HTTP-ответ с данными, полученными из сериализатора, в формате JSON
     return Response(serializer.data)
