@@ -74,3 +74,29 @@ def deleteJob(request, pk):
     # Возвращаем JSON-ответ, сообщая, что вакансия была удалена, и код состояния HTTP 200 (OK)
     return Response({'message': 'Job is Deleted.'}, status=status.HTTP_200_OK)
 
+
+@api_view(['GET'])
+def getTopicStats(request, topic):
+    # Создаем словарь аргументов для фильтрации вакансий, где заголовок содержит указанную тему.
+    args = { 'title__icontains': topic }
+
+    # Используем фильтрацию для получения вакансий, соответствующих заданным аргументам.
+    jobs = Job.objects.filter(**args)
+
+    # Проверяем, были ли найдены вакансии для заданной темы.
+    if len(jobs) == 0:
+        return Response({ 'message': 'No stats found for {topic}'.format(topic=topic) })
+
+    # Выполняем агрегацию статистики по найденным вакансиям.
+    stats = jobs.aggregate(
+        total_jobs = Count('title'),   # Общее количество вакансий
+        avg_positions = Avg('positions'),  # Среднее количество позиций
+        avg_salary = Avg('salary'),   # Средняя зарплата
+        min_salary = Min('salary'),   # Минимальная зарплата
+        max_salary = Max('salary')    # Максимальная зарплата
+    )
+
+    # Возвращаем результаты агрегации в ответе HTTP.
+    return Response(stats)
+
+
