@@ -7,16 +7,37 @@ from .serializers import JobSerializer
 from .models import Job
 from django.shortcuts import get_object_or_404
 from .filters import JobsFilter
+from rest_framework.pagination import PageNumberPagination
 
 @api_view(['GET'])
 def getAllJobs(request):
+    # Создание объекта фильтра и применение фильтров
     filterset = JobsFilter(request.GET, queryset=Job.objects.all().order_by('id'))
 
-    # Создаем сериализатор JobSerializer, который будет использоваться для преобразования объектов Job в JSON
-    serializer = JobSerializer(filterset.qs, many=True)
+    # Получение общего количества элементов после применения фильтров
+    count = filterset.qs.count()
 
-    # Возвращаем HTTP-ответ с данными, полученными из сериализатора, в формате JSON
-    return Response(serializer.data)
+    # Установка количества результатов на странице
+    resPerPage = 3
+
+    # Создание объекта пагинации
+    paginator = PageNumberPagination()
+
+    # Установка количества результатов на странице для пагинации
+    paginator.page_size = resPerPage
+
+    # Применение пагинации к отфильтрованным данным
+    queryset = paginator.paginate_queryset(filterset.qs, request)
+
+    # Создание сериализатора для данных
+    serializer = JobSerializer(queryset, many=True)
+
+    # Формирование и возврат HTTP-ответа
+    return Response({
+        "count": count,  # Общее количество элементов после фильтрации
+        "resPerPage": resPerPage,  # Количество результатов на странице
+        'jobs': serializer.data  # Данные о вакансиях после сериализации
+    })
 
 
 @api_view(['GET'])
