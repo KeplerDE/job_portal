@@ -74,3 +74,28 @@ def currentUser(request):
     user = UserSerializer(request.user)  # Создаем сериализатор для текущего пользователя из запроса
 
     return Response(user.data)  # Возвращаем данные текущего пользователя в виде JSON-ответа
+
+
+@api_view(['PUT'])  # Это представление доступно для HTTP PUT-запросов
+
+@permission_classes([IsAuthenticated])  # Требует аутентификации пользователя для доступа к этому представлению
+
+def updateUser(request):
+    user = request.user  # Получаем аутентифицированного пользователя, сделавшего запрос
+
+    data = request.data  # Извлекаем данные из PUT-запроса
+
+    # Обновляем информацию пользователя данными из запроса
+    user.first_name = data['first_name']
+    user.last_name = data['last_name']
+    user.username = data['email']
+    user.email = data['email']
+
+    if data['password'] != '':  # Проверяем, предоставлен ли новый пароль
+        user.password = make_password(data['password'])  # Хешируем и устанавливаем новый пароль
+
+    user.save()  # Сохраняем обновленную информацию пользователя в базе данных
+
+    # Создаем сериализатор пользователя и возвращаем обновленные данные пользователя в виде JSON-ответа
+    serializer = UserSerializer(user, many=False)
+    return Response(serializer.data)
