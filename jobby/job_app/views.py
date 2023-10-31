@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -8,6 +8,7 @@ from .models import Job
 from django.shortcuts import get_object_or_404
 from .filters import JobsFilter
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 
 @api_view(['GET'])
 def getAllJobs(request):
@@ -50,6 +51,7 @@ def getJob(request, pk):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def newJob(request):
     data = request.data
 
@@ -60,8 +62,12 @@ def newJob(request):
 
 
 @api_view(['PUT'])
+
 def updateJob(request, pk):
     job = get_object_or_404(Job, id=pk)
+
+    if job.user != request.user:
+        return Response({ 'message': 'You can not update this job' }, status=status.HTTP_403_FORBIDDEN)
 
     # Обновление полей объекта job данными из запроса
     job.title = request.data['title']
@@ -84,11 +90,12 @@ def updateJob(request, pk):
     return Response(serializer.data)
 
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def deleteJob(request, pk):
-    # Получаем объект вакансии с заданным идентификатором (pk) или возвращаем ошибку 404, если он не существует
     job = get_object_or_404(Job, id=pk)
-    print(job)
-    # Удаляем объект вакансии из базы данных.
+
+    if job.user != request.user:
+        return Response({ 'message': 'You can not delete this job' }, status=status.HTTP_403_FORBIDDEN)
     job.delete()
 
     # Возвращаем JSON-ответ, сообщая, что вакансия была удалена, и код состояния HTTP 200 (OK)
