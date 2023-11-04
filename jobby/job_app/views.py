@@ -2,9 +2,10 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
+from django.utils import timezone
 
 from .serializers import JobSerializer
-from .models import Job
+from .models import Job, CandidatesApplied
 from django.shortcuts import get_object_or_404
 from .filters import JobsFilter
 from rest_framework.pagination import PageNumberPagination
@@ -126,4 +127,41 @@ def getTopicStats(request, topic):
     # Возвращаем результаты агрегации в ответе HTTP.
     return Response(stats)
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+
+# Определяем функцию applyToJob, которая принимает запрос и первичный ключ вакансии
+def applyToJob(request, pk):
+
+    user = request.user # Получаем пользователя, отправившего запрос
+    job = get_object_or_404(Job, id=pk) # Получаем вакансию по первичному ключу или возвращаем 404 ошибку, если вакансия не найдена
+
+    # Проверяем, загрузил ли пользователь свое резюме
+    if user.userprofile.resume == '':
+        return Response({ 'error': 'Please upload your resume first' }, status=status.HTTP_400_BAD_REQUEST)
+
+    # Проверяем, не истек ли срок подачи заявок на вакансию
+    if job.lastDate < timezone.now():
+        return Response({ 'error': 'You can not apply to this job. Date is over' }, status=status.HTTP_400_BAD_REQUEST)
+
+    # Проверяем, не подавал ли пользователь заявку на эту вакансию ранее
+    alreadyApplied = job.candidatesapplied_set.filter(user=user).exists()
+
+    if alreadyApplied:
+        return Response({ 'error': 'You have already apply to this job.' }, status=status.HTTP_400_BAD_REQUEST)
+
+    # Создаем новую заявку на вакансию
+    jobApplied = CandidatesApplied.objects.create(
+        job = job,
+        user = user,
+        resume = user.userprofile.resume
+    )
+
+    # Возвращаем ответ с информацией о том, что заявка успешно создана
+    return Response({
+        'applied': True,
+        'job_id': jobApplied.id
+    },
+    status=status.HTTP_200_OK
+    )
 
