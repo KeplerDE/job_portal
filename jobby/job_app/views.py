@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
 
-from .serializers import JobSerializer
+from .serializers import JobSerializer, CandidatesAppliedSerializer
 from .models import Job, CandidatesApplied
 from django.shortcuts import get_object_or_404
 from .filters import JobsFilter
@@ -165,3 +165,14 @@ def applyToJob(request, pk):
     status=status.HTTP_200_OK
     )
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getCurrentUserAppliedJobs(request):
+
+    args = { 'user_id': request.user.id }       # Аргументы для фильтрации запроса: идентификатор текущего пользователя
+
+    jobs = CandidatesApplied.objects.filter(**args)    # Получение списка объектов CandidatesApplied, соответствующих критериям поиска
+
+    serializer = CandidatesAppliedSerializer(jobs, many=True) # Сериализация данных. Преобразование списка объектов в формат, подходящий для передачи по HTTP
+
+    return Response(serializer.data)              # Возвращение ответа HTTP с сериализованными данными
