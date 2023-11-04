@@ -176,3 +176,18 @@ def getCurrentUserAppliedJobs(request):
     serializer = CandidatesAppliedSerializer(jobs, many=True) # Сериализация данных. Преобразование списка объектов в формат, подходящий для передачи по HTTP
 
     return Response(serializer.data)              # Возвращение ответа HTTP с сериализованными данными
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+
+# Метод для проверки, подал ли аутентифицированный пользователь заявку на вакансию с поиском по id вакансии
+def isApplied(request, pk):
+    user = request.user  # получаем данные текущего пользователя
+    job = get_object_or_404(Job, id=pk)  # получаем объект вакансии по id. Если такой вакансии нет, возвращаем 404 ошибку
+
+    # проверяем, существует ли запись в таблице candidatesapplied с текущим пользователем и заданной вакансией
+    # используем метод .exists() для возвращения булева значения
+    applied = job.candidatesapplied_set.filter(user=user).exists()
+
+    return Response(applied)
