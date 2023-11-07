@@ -1,14 +1,13 @@
 import Layout from "../../components/layout/Layout";
 import axios from "axios";
+import JobDetails from "@/components/job/JobDetails";
 
 
-export default function JobDetailsPage( {job} ) {
+export default function JobDetailsPage( { job } ) {
     console.log(job)
     return (
         <Layout>
-            <h1>
-                Job Details
-            </h1>
+            <JobDetails job={job}  />
         </Layout>
     )
 }
