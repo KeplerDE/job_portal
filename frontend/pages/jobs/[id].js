@@ -1,17 +1,21 @@
 import Layout from "../../components/layout/Layout";
 import axios from "axios";
 import JobDetails from "@/components/job/JobDetails";
+import NotFound from "../../components/layout/NotFound";
 
 
-export default function JobDetailsPage( { job, candidates} ) {
-    console.log(job)
-    return (
-        <Layout>
-            <JobDetails job={job} candidates={candidates}  />
-        </Layout>
-    )
+export default function JobDetailsPage({ job, candidates, error }) {
+  if (error?.includes("Not found")) return <NotFound />;
+
+  // If there's no job, we should also render NotFound or a similar component.
+  if (!job) return <NotFound />;
+
+  return (
+    <Layout title={job.title}>
+      <JobDetails job={job} candidates={candidates} />
+    </Layout>
+  );
 }
-
 
 export async function getServerSideProps({ params }) {
   try {

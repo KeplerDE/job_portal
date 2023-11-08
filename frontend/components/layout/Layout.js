@@ -9,7 +9,7 @@ const Layout = ({ children, title = "Jobbee - Find you Job Now" }) => {
   return (
     <div>
       <Head>
-        <title>{title}</title>
+        <title>{title} - Jobbee</title>
       </Head>
 
       <Script
