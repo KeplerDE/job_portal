@@ -3,11 +3,11 @@ import axios from "axios";
 import JobDetails from "@/components/job/JobDetails";
 
 
-export default function JobDetailsPage( { job } ) {
+export default function JobDetailsPage( { job, candidates} ) {
     console.log(job)
     return (
         <Layout>
-            <JobDetails job={job}  />
+            <JobDetails job={job} candidates={candidates}  />
         </Layout>
     )
 }
@@ -16,11 +16,14 @@ export default function JobDetailsPage( { job } ) {
 export async function getServerSideProps({ params }) {
   try {
     const response = await axios.get(`http://127.0.0.1:8000/api/jobs/${params.id}`);
-    const job = response.data;
+    const responseData = response.data;
+    const job = responseData.job;
+    const candidates = responseData.candidates;
 
     return {
       props: {
         job,
+        candidates,
       },
     };
   } catch (error) {
@@ -29,6 +32,8 @@ export async function getServerSideProps({ params }) {
     return {
       props: {
         job: null,
+        candidates: null,
+        error: "Error fetching data",
       },
     };
   }
