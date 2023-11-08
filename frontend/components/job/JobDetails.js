@@ -1,9 +1,29 @@
 import React, { useEffect } from "react";
 import moment from "moment";
+import mapboxgl from "mapbox-gl/dist/mapbox-gl.js";
+
+mapboxgl.accessToken = process.env.MAPBOX_ACCESS_TOKEN;
 
 
 const JobDetails = ({ job, candidates }) => {
+  useEffect(() => {
+    const initMap = async () => {
+      const cooridnates = job.point.split("(")[1].replace(")", "").split(" ");
 
+      // Create map and set the center point
+      const map = new mapboxgl.Map({
+        container: "job-map",
+        style: "mapbox://styles/mapbox/streets-v11",
+        center: cooridnates,
+        zoom: 11,
+      });
+
+      // Add market on map
+      new mapboxgl.Marker().setLngLat(cooridnates).addTo(map);
+    };
+
+    initMap();
+  }, [job]); // Make sure to add 'job' as a dependency if the map ne
 
   return (
     <div className="job-details-wrapper">
