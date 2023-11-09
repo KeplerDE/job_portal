@@ -17,9 +17,11 @@ export async function getServerSideProps({ query }) {
   // Retrieve keyword and location from the query parameters
   const keyword = query.keyword || "";
   const location = query.location || "";
+  const page = query.page || "";
 
   // Construct the search query string
-  const queryStr = `keyword=${encodeURIComponent(keyword)}&location=${encodeURIComponent(location)}`;
+  // const queryStr = `keyword=${encodeURIComponent(keyword)}&location=${encodeURIComponent(location)}`;
+  const queryStr = `keyword=${encodeURIComponent(keyword)}&location=${encodeURIComponent(location)}${encodeURIComponent(page)}`;
 
   // Hardcoded server URL
   const serverUrl = 'http://127.0.0.1:8000/api/jobs/';
