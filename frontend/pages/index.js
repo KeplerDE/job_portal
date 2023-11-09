@@ -11,9 +11,22 @@ export default function Index({ data }) {
   );
 }
 
-export async function getServerSideProps() {
+
+
+export async function getServerSideProps({ query }) {
+  // Retrieve keyword and location from the query parameters
+  const keyword = query.keyword || "";
+  const location = query.location || "";
+
+  // Construct the search query string
+  const queryStr = `keyword=${encodeURIComponent(keyword)}&location=${encodeURIComponent(location)}`;
+
+  // Hardcoded server URL
+  const serverUrl = 'http://127.0.0.1:8000/api/jobs/';
+
+  // Make the request to the server with the search query string
   try {
-    const response = await axios.get("http://127.0.0.1:8000/api/jobs/");
+    const response = await axios.get(`${serverUrl}?${queryStr}`);
     const data = response.data;
 
     return {
@@ -22,10 +35,14 @@ export async function getServerSideProps() {
       },
     };
   } catch (error) {
-    console.error("Error fetching data:", error);
+    // Log the error to the console
+    console.error('Error fetching data:', error);
+
+    // Return an error prop along with empty data
     return {
       props: {
         data: [],
+        error: 'Failed to fetch data',
       },
     };
   }
