@@ -1,9 +1,9 @@
 import Layout from "../components/layout/Layout";
 import Home from "../components/Home";
+
 import axios from "axios";
 
 export default function Index({ data }) {
-  console.log("jobs", data);
   return (
     <Layout>
       <Home data={data} />
@@ -11,41 +11,35 @@ export default function Index({ data }) {
   );
 }
 
-
-
 export async function getServerSideProps({ query }) {
-  // Retrieve keyword and location from the query parameters
+  const jobType = query.jobType || "";
+  const education = query.education || "";
+  const experience = query.experience || "";
   const keyword = query.keyword || "";
   const location = query.location || "";
-  const page = query.page || "";
+  const page = query.page || 1;
 
-  // Construct the search query string
-  // const queryStr = `keyword=${encodeURIComponent(keyword)}&location=${encodeURIComponent(location)}`;
-  const queryStr = `keyword=${encodeURIComponent(keyword)}&location=${encodeURIComponent(location)}${encodeURIComponent(page)}`;
+  let min_salary = "";
+  let max_salary = "";
 
-  // Hardcoded server URL
-  const serverUrl = 'http://127.0.0.1:8000/api/jobs/';
-
-  // Make the request to the server with the search query string
-  try {
-    const response = await axios.get(`${serverUrl}?${queryStr}`);
-    const data = response.data;
-
-    return {
-      props: {
-        data,
-      },
-    };
-  } catch (error) {
-    // Log the error to the console
-    console.error('Error fetching data:', error);
-
-    // Return an error prop along with empty data
-    return {
-      props: {
-        data: [],
-        error: 'Failed to fetch data',
-      },
-    };
+  // Correctly parse the salary range from the query
+  if (query.salary) {
+    const salaryRange = query.salary.split("-");
+    if (salaryRange.length === 2) {
+      [min_salary, max_salary] = salaryRange;
+    }
   }
+
+  // Construct the query string using template literals and encodeURIComponent for parameter values
+  const queryStr = `keyword=${encodeURIComponent(keyword)}&location=${encodeURIComponent(location)}&page=${encodeURIComponent(page)}&jobType=${encodeURIComponent(jobType)}&education=${encodeURIComponent(education)}&experience=${encodeURIComponent(experience)}&min_salary=${encodeURIComponent(min_salary)}&max_salary=${encodeURIComponent(max_salary)}`;
+
+  // Replace process.env.API_URL with the provided static URL
+  const res = await axios.get(`http://127.0.0.1:8000/api/jobs?${queryStr}`);
+  const data = res.data;
+
+  return {
+    props: {
+      data,
+    },
+  };
 }
