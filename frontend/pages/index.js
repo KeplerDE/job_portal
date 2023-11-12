@@ -34,7 +34,7 @@ export async function getServerSideProps({ query }) {
   const queryStr = `keyword=${encodeURIComponent(keyword)}&location=${encodeURIComponent(location)}&page=${encodeURIComponent(page)}&jobType=${encodeURIComponent(jobType)}&education=${encodeURIComponent(education)}&experience=${encodeURIComponent(experience)}&min_salary=${encodeURIComponent(min_salary)}&max_salary=${encodeURIComponent(max_salary)}`;
 
   // Replace process.env.API_URL with the provided static URL
-  const res = await axios.get(`http://127.0.0.1:8000/api/jobs?${queryStr}`);
+  const res = await axios.get(`${process.env.API_URL}/api/jobs?${queryStr}`);
   const data = res.data;
 
   return {

@@ -7,7 +7,7 @@ export default async (req, res) => {
 
     try {
       const response = await axios.post(
-        `http://127.0.0.1:8000/api/token/`,
+        `${process.env.API_URL}/api/token/`,
         {
           username,
           password,
@@ -18,7 +18,7 @@ export default async (req, res) => {
           },
         }
       );
-
+      console.log(process.env.API_URL)
       if (response.data.access) {
         res.setHeader("Set-Cookie", [
           cookie.serialize("access", response.data.access, {
