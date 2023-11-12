@@ -5,7 +5,10 @@ import Script from "next/script";
 import Header from "./Header";
 import Footer from "./Footer";
 
-const Layout = ({ children, title = "Jobbee - Find you Job Now" }) => {
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+const Layout = ({ children, title = "Find you Job Now" }) => {
   return (
     <div>
       <Head>
@@ -30,6 +33,8 @@ const Layout = ({ children, title = "Jobbee - Find you Job Now" }) => {
         src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js"
       ></Script>
 
+      <ToastContainer position="bottom-right" />
+
       <Header />
       {children}
       <Footer />
@@ -37,4 +42,4 @@ const Layout = ({ children, title = "Jobbee - Find you Job Now" }) => {
   );
 };
 
-export default Layout;
+export default Layout
