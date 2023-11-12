@@ -19,30 +19,41 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
-  // Login user
-  const login = async ({ username, password }) => {
-    try {
-      setLoading(true);
+// Функция для входа пользователя в систему
+const login = async ({ username, password }) => {
+  try {
+    // Устанавливаем состояние загрузки в true
+    setLoading(true);
 
-      const res = await axios.post("/api/auth/login", {
-        username,
-        password,
-      });
+    // Отправляем POST-запрос на сервер для аутентификации пользователя
+    // Передаем в запросе имя пользователя и пароль
+    const res = await axios.post("/api/auth/login", {
+      username,
+      password,
+    });
 
-      if (res.data.success) {
-        loadUser();
-        setIsAuthenticated(true);
-        setLoading(false);
-        router.push("/");
-      }
-    } catch (error) {
+    // Проверяем, успешно ли выполнен вход (поле success в ответе сервера)
+    if (res.data.success) {
+      // Загружаем данные пользователя
+      loadUser();
+      // Устанавливаем состояние аутентификации в true
+      setIsAuthenticated(true);
+      // Завершаем процесс загрузки
       setLoading(false);
-      setError(
-        error.response &&
-          (error.response.data.detail || error.response.data.error)
-      );
+      // Перенаправляем пользователя на главную страницу
+      router.push("/");
     }
-  };
+  } catch (error) {
+    // В случае ошибки отключаем состояние загрузки
+    setLoading(false);
+    // Устанавливаем сообщение об ошибке, полученное от сервера
+    setError(
+      error.response &&
+      (error.response.data.detail || error.response.data.error)
+    );
+  }
+};
+
 
   // Register user
   const register = async ({ firstName, lastName, email, password }) => {
