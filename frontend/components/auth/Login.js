@@ -7,13 +7,11 @@ import AuthContext from "../../context/AuthContext";
 import { toast } from "react-toastify";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const router = useRouter();
-
-  const { loading, error, isAuthenticated, login, clearErrors } =
-    useContext(AuthContext);
+  const { loading, error, isAuthenticated, login, clearErrors } = useContext(AuthContext);
 
   useEffect(() => {
     if (error) {
@@ -28,7 +26,7 @@ const Login = () => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    login({ username: email, password });
+    login({ username, password }); // Используйте username вместо email
   };
 
   return (
@@ -52,14 +50,12 @@ const Login = () => {
             <form className="form" onSubmit={submitHandler}>
               <div className="inputWrapper">
                 <div className="inputBox">
-                  <i aria-hidden className="fas fa-envelope"></i>
+                  <i aria-hidden className="fas fa-user"></i>
                   <input
-                    type="email"
-                    placeholder="Enter Your Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    pattern="\S+@\S+\.\S+"
-                    title="Your email is invalid"
+                    type="text"
+                    placeholder="Enter Your Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
                   />
                 </div>

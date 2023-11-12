@@ -1,3 +1,4 @@
+// pages/_document.js
 import { Html, Head, Main, NextScript } from "next/document";
 
 export default function Document() {
@@ -14,6 +15,7 @@ export default function Document() {
           href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css"
           rel="stylesheet"
         />
+        {/* Other tags that are common across all pages can go here */}
       </Head>
       <body>
         <Main />
