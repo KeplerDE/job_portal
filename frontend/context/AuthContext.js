@@ -9,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [updated, setUpdated] = useState(null);
   const [error, setError] = useState(null);
 
   const router = useRouter();
@@ -131,6 +132,43 @@ const register = async ({ firstName, lastName, email, password }) => {
       );
     }
   };
+  // Update user
+  const updateProfile = async (
+    { firstName, lastName, email, password },
+    access_token
+  ) => {
+    try {
+      setLoading(true);
+
+      const res = await axios.put(
+        `${process.env.API_URL}/api/me/update/`,
+        {
+          first_name: firstName,
+          last_name: lastName,
+          email,
+          password,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+
+      if (res.data) {
+        setLoading(false);
+        setUpdated(true);
+        setUser(res.data);
+      }
+    } catch (error) {
+      console.log(error.response);
+      setLoading(false);
+      setError(
+        error.response &&
+          (error.response.data.detail || error.response.data.error)
+      );
+    }
+  };
 
   // Clear Errors
   const clearErrors = () => {
@@ -144,9 +182,12 @@ const register = async ({ firstName, lastName, email, password }) => {
         user,
         error,
         isAuthenticated,
+        updated,
         login,
         register,
+        updateProfile,
         logout,
+        setUpdated,
         clearErrors,
       }}
     >
@@ -154,5 +195,6 @@ const register = async ({ firstName, lastName, email, password }) => {
     </AuthContext.Provider>
   );
 };
+
 
 export default AuthContext;
