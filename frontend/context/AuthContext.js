@@ -55,33 +55,39 @@ const login = async ({ username, password }) => {
 };
 
 
-  // Register user
-  const register = async ({ firstName, lastName, email, password }) => {
-    try {
-      setLoading(true);
+// Функция для регистрации пользователя
+const register = async ({ firstName, lastName, email, password }) => {
+  try {
+    setLoading(true); // Включаем индикатор загрузки
 
-      const res = await axios.post(`${process.env.API_URL}/api/register/`, {
-        first_name: firstName,
-        last_name: lastName,
-        email,
-        password,
-      });
+    // Отправляем POST-запрос на сервер для регистрации пользователя
+    const res = await axios.post(`${process.env.API_URL}/api/register/`, {
+      first_name: firstName, // Передаем имя пользователя
+      last_name: lastName,   // Передаем фамилию пользователя
+      email,                 // Передаем email пользователя
+      password,              // Передаем пароль пользователя
+    });
 
-      console.log(res.data);
+    console.log(res.data); // Выводим в консоль полученные данные для отладки
 
-      if (res.data.message) {
-        setLoading(false);
-        router.push("/login");
-      }
-    } catch (error) {
-      console.log(error.response);
-      setLoading(false);
-      setError(
-        error.response &&
-          (error.response.data.detail || error.response.data.error)
-      );
+    // Проверяем, содержит ли ответ сообщение (например, об успешной регистрации)
+    if (res.data.message) {
+      setLoading(false); // Выключаем индикатор загрузки
+      router.push("/login"); // Перенаправляем пользователя на страницу входа
     }
-  };
+  } catch (error) {
+    console.log(error.response); // Выводим ошибку в консоль для отладки
+    setLoading(false); // Выключаем индикатор загрузки
+
+    // Устанавливаем сообщение об ошибке, полученное от сервера
+    setError(
+      error.response &&
+      (error.response.data.detail || error.response.data.error)
+    );
+  }
+};
+
+
 
   // Load user
   const loadUser = async () => {
