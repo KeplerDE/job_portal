@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [updated, setUpdated] = useState(null);
+  const [uploaded, setUploaded] = useState(null);
   const [error, setError] = useState(null);
 
   const router = useRouter();
@@ -169,6 +170,34 @@ const register = async ({ firstName, lastName, email, password }) => {
       );
     }
   };
+  // Upload Resume
+  const uploadResume = async (formData, access_token) => {
+    try {
+      setLoading(true);
+
+      const res = await axios.put(
+        `${process.env.API_URL}/api/upload/resume/`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+
+      if (res.data) {
+        setLoading(false);
+        setUploaded(true);
+      }
+    } catch (error) {
+      console.log(error.response);
+      setLoading(false);
+      setError(
+        error.response &&
+          (error.response.data.detail || error.response.data.error)
+      );
+    }
+  };
 
   // Clear Errors
   const clearErrors = () => {
@@ -183,11 +212,14 @@ const register = async ({ firstName, lastName, email, password }) => {
         error,
         isAuthenticated,
         updated,
+        uploaded,
         login,
         register,
         updateProfile,
         logout,
         setUpdated,
+        setUploaded,
+        uploadResume,
         clearErrors,
       }}
     >
