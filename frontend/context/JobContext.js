@@ -73,6 +73,25 @@ export const JobProvider = ({ children }) => {
     }
   };
 
+  // Функция для получения статистики по теме
+  const getTopicStats = async (topic) => {
+    try {
+      setLoading(true); // Включение индикатора загрузки
+
+      // Отправка GET-запроса для получения статистики
+      const res = await axios.get(`${process.env.API_URL}/api/stats/${topic}/`);
+
+      setLoading(false); // Выключение индикатора загрузки
+      setStats(res.data); // Обновление состояния статистики
+    } catch (error) {
+      setLoading(false); // Выключение индикатора загрузки при ошибке
+      // Установка сообщения об ошибке
+      setError(
+        error.response &&
+          (error.response.data.detail || error.response.data.error)
+      );
+    }
+  };
   // Функция для очистки сообщений об ошибках
   const clearErrors = () => {
     setError(null);
@@ -87,6 +106,7 @@ export const JobProvider = ({ children }) => {
         updated,
         applied,
         stats,
+        getTopicStats,
         applyToJob,
         checkJobApplied,
         setUpdated,
