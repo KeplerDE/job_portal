@@ -1,43 +1,50 @@
 import Layout from "../../components/layout/Layout";
-import axios from "axios";
-import JobDetails from "@/components/job/JobDetails";
 import NotFound from "../../components/layout/NotFound";
+import JobDetails from "../../components/job/JobDetails";
 
+import axios from "axios";
 
-export default function JobDetailsPage({ job, candidates, error }) {
+export default function JobDetailsPage({
+  job,
+  candidates,
+  access_token,
+  error,
+}) {
   if (error?.includes("Not found")) return <NotFound />;
-
-  // If there's no job, we should also render NotFound or a similar component.
-  if (!job) return <NotFound />;
 
   return (
     <Layout title={job.title}>
-      <JobDetails job={job} candidates={candidates} />
+      <JobDetails
+        job={job}
+        candidates={candidates}
+        access_token={access_token}
+      />
     </Layout>
   );
 }
 
-export async function getServerSideProps({ params }) {
+export async function getServerSideProps({ req, params }) {
   try {
-    const response = await axios.get(`http://127.0.0.1:8000/api/jobs/${params.id}`);
-    const responseData = response.data;
-    const job = responseData.job;
-    const candidates = responseData.candidates;
+    const res = await axios.get(
+      `${process.env.API_URL}/api/jobs/${params.id}/`
+    );
+
+    const job = res.data.job;
+    const candidates = res.data.candidates;
+
+    const access_token = req.cookies.access || "";
 
     return {
       props: {
         job,
         candidates,
+        access_token,
       },
     };
   } catch (error) {
-    console.error('Error fetching data:', error);
-
     return {
       props: {
-        job: null,
-        candidates: null,
-        error: "Error fetching data",
+        error: error.response.data.detail,
       },
     };
   }
