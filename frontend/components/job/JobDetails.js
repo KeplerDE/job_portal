@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 mapboxgl.accessToken = process.env.MAPBOX_ACCESS_TOKEN;
 
 const JobDetails = ({ job, candidates, access_token }) => {
-  const { applyToJob, applied, clearErrors, error, loading } =
+  const { applyToJob, applied, checkJobApplied, clearErrors, error, loading } =
     useContext(JobContext);
 
   // Determine if the last date to apply has passed
@@ -32,6 +32,8 @@ const JobDetails = ({ job, candidates, access_token }) => {
       toast.error(error);
       clearErrors();
     }
+
+    checkJobApplied(job.id, access_token);
   }, [error]);
 
   const applyToJobHandler = () => {

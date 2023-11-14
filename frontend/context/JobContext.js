@@ -21,7 +21,6 @@ export const JobProvider = ({ children }) => {
   const applyToJob = async (id, access_token) => {
     try {
       setLoading(true); // Включение индикатора загрузки
-
       // Отправка POST-запроса для подачи заявки на работу
       const res = await axios.post(
         `${process.env.API_URL}/api/jobs/${id}/apply/`,
@@ -47,7 +46,32 @@ export const JobProvider = ({ children }) => {
     }
   };
 
+  // Функция для проверки, подана ли заявка на работу
+  const checkJobApplied = async (id, access_token) => {
+    try {
+      setLoading(true); // Включение индикатора загрузки
 
+      // Отправка GET-запроса для проверки статуса заявки
+      const res = await axios.get(
+        `${process.env.API_URL}/api/jobs/${id}/check/`,
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+
+      setLoading(false); // Выключение индикатора загрузки
+      setApplied(res.data); // Обновление состояния подачи заявки
+    } catch (error) {
+      setLoading(false); // Выключение индикатора загрузки при ошибке
+      // Установка сообщения об ошибке
+      setError(
+        error.response &&
+          (error.response.data.detail || error.response.data.error)
+      );
+    }
+  };
 
   // Функция для очистки сообщений об ошибках
   const clearErrors = () => {
@@ -64,6 +88,7 @@ export const JobProvider = ({ children }) => {
         applied,
         stats,
         applyToJob,
+        checkJobApplied,
         setUpdated,
         clearErrors,
       }}
