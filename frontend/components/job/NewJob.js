@@ -55,9 +55,11 @@ const NewJob = ({ access_token }) => {
       company,
     };
 
-    console.log(data);
 
     newJob(data, access_token);
+    console.log("This is token " + access_token);
+
+
   };
 
   return (
